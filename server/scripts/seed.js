@@ -50,6 +50,7 @@ const seedData = async () => {
       status: 'Open',
       assignedTo: talent1._id,
       dueDate: '2024-06-15',
+      rewardAmount: 1200,
       createdBy: admin._id,
     },
     {
@@ -59,6 +60,7 @@ const seedData = async () => {
       status: 'Claimed',
       assignedTo: talent1._id,
       dueDate: '2024-06-20',
+      rewardAmount: 900,
       createdBy: admin._id,
     },
     {
@@ -68,6 +70,7 @@ const seedData = async () => {
       status: 'Submitted',
       assignedTo: talent2._id,
       dueDate: '2024-06-10',
+      rewardAmount: 650,
       createdBy: admin._id,
     },
     {
@@ -76,6 +79,7 @@ const seedData = async () => {
         'Plan and draft 30 days of social content across LinkedIn, Twitter, and Instagram for the talent portal launch.',
       assignedTo: talent2._id,
       dueDate: '2024-07-01',
+      rewardAmount: 500,
       createdBy: admin._id,
     },
     {
@@ -84,6 +88,7 @@ const seedData = async () => {
         'Write compelling hero copy, feature descriptions, and CTAs for the new landing page. Deliver as a Google Doc.',
       status: 'Open',
       dueDate: '2024-06-28',
+      rewardAmount: 750,
       createdBy: admin._id,
     },
   ]);

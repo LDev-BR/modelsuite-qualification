@@ -245,29 +245,7 @@ The app will open at `http://localhost:5173`
 
 ---
 
-<<<<<<< HEAD
-##  Contribution Guidelines
-
-**This repository is used for candidate assessment as part of our hiring process.**
-
-To submit your work:
-
-1. **Read the complete guide:** [CONTRIBUTING.md](./CONTRIBUTING.md)
-2. Fork this repository to your GitHub account
-3. Create a task branch (never work on `master`)
-4. Complete your assigned task following our code standards
-5. Test locally using `npm run lint` and `npm run build`
-6. Submit a PR following the required format
-
-** Important:**
-- All PRs are automatically tested via CI/CD
-- PRs that fail any check will be **automatically closed**
-- PR title must follow format: `[TASK-ID]-description`
-- PR description must be complete with testing steps and screenshots (for UI changes)
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed instructions and requirements.
-=======
-## 🤝 Contribution and Qualification
+## Contribution and Qualification
 
 Welcome! If you are participating in a qualification assessment or contributing to this repository, you must follow our structured process for branching, local checks, and Pull Requests.
 

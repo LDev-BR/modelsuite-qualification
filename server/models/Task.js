@@ -18,6 +18,11 @@ const taskSchema = new mongoose.Schema(
     dueDate: {
       type: String,
     },
+    rewardAmount: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

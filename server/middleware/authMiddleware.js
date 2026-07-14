@@ -9,7 +9,7 @@ const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select('-password');
       next();
-    } catch (error) {
+    } catch {
       res.status(401).json({ message: 'Not authorized, token failed' });
     }
   }
@@ -26,4 +26,12 @@ const adminOnly = (req, res, next) => {
   }
 };
 
-module.exports = { protect, adminOnly };
+const talentOnly = (req, res, next) => {
+  if (req.user && req.user.role === 'Talent') {
+    next();
+  } else {
+    res.status(403).json({ message: 'Access denied: Talents only' });
+  }
+};
+
+module.exports = { protect, adminOnly, talentOnly };

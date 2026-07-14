@@ -3,7 +3,7 @@ const NotFoundPage = () => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-bg-dark text-text-primary">
     {/* Ambient glow */}
     <div className="absolute w-[400px] h-[400px] rounded-full pointer-events-none opacity-30"
-      style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%)' }} />
+      style={{ background: 'radial-gradient(circle, var(--ms-glow-primary) 0%, transparent 70%)' }} />
 
     <div className="relative z-10 text-center">
       <p className="text-[120px] font-extrabold tracking-tight leading-none gradient-text">404</p>

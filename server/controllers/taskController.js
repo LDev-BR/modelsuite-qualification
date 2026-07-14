@@ -1,4 +1,5 @@
-﻿const Task = require('../models/Task');
+const Task = require('../models/Task');
+const { buildTaskRewardAmount } = require('../utils/taskReward');
 
 // @desc  Get all tasks
 // @route GET /api/tasks
@@ -21,7 +22,6 @@ const getAllTasks = async (req, res) => {
 // @access Admin
 const getTaskById = async (req, res) => {
   try {
-    // — will throw a CastError from Mongoose instead of a clean 400
     const task = await Task.findById(req.params.id)
       .populate('assignedTo', 'name email')
       .populate('createdBy', 'name');
@@ -38,7 +38,7 @@ const getTaskById = async (req, res) => {
 // @route POST /api/tasks
 // @access Admin
 const createTask = async (req, res) => {
-  const { title, description, status, assignedTo, dueDate } = req.body;
+  const { title, description, status, assignedTo, dueDate, rewardAmount } = req.body;
 
   try {
     const task = await Task.create({
@@ -47,12 +47,13 @@ const createTask = async (req, res) => {
       status,
       assignedTo: assignedTo || null,
       dueDate,
+      rewardAmount: buildTaskRewardAmount(rewardAmount),
       createdBy: req.user._id,
     });
 
     res.status(201).json(task);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
@@ -63,16 +64,21 @@ const updateTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: 'Task not found' });
-    // including internal fields like createdBy or __v
+
+    const update = { ...req.body };
+    if (Object.prototype.hasOwnProperty.call(update, 'rewardAmount')) {
+      update.rewardAmount = buildTaskRewardAmount(update.rewardAmount);
+    }
+
     const updated = await Task.findByIdAndUpdate(
       req.params.id,
-      { ...req.body },
-      { new: true }
+      update,
+      { new: true, runValidators: true }
     ).populate('assignedTo', 'name email');
 
     res.json(updated);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
@@ -83,7 +89,7 @@ const deleteTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: 'Task not found' });
-    // — orphaned Submission documents remain in DB after task deletion
+
     await Task.findByIdAndDelete(req.params.id);
 
     res.json({ message: 'Task deleted' });
