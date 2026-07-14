@@ -23,8 +23,9 @@ A full-stack task management system for talent onboarding workflows. Built with 
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | React 18 + Vite 5 |
+| **Frontend** | React 19 + Vite 8 |
 | **Styling** | Tailwind CSS v4 + custom CSS |
+| **Routing & UX** | React Router 7 + Sonner toast notifications |
 | **Backend** | Node.js + Express 4 |
 | **Database** | MongoDB + Mongoose |
 | **Auth** | JWT (jsonwebtoken + bcryptjs) |
@@ -42,7 +43,7 @@ modelsuite-qualification/
 │       ├── components/
 │       │   ├── admin/       # Admin-specific UI components
 │       │   └── talent/      # Talent-specific UI components
-│       ├── context/         # AuthContext (JWT auth state)
+│       ├── context/         # Auth, theme, and toast providers
 │       └── pages/
 │           ├── admin/       # Admin dashboard pages
 │           └── talent/      # Talent dashboard pages
@@ -117,9 +118,9 @@ npm run seed
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | `admin@test.com` | `password123` |
-| Talent | `talent1@test.com` | `password123` |
-| Talent | `talent2@test.com` | `password123` |
+| Admin | `admin@taskpipeline.com` | `admin123` |
+| Talent | `alice@taskpipeline.com` | `talent123` |
+| Talent | `bob@taskpipeline.com` | `talent123` |
 
 ### 5. Install frontend dependencies
 
@@ -154,15 +155,20 @@ The app will open at `http://localhost:5173`
 
 ### Admin
 - Log in at `/login`
-- **Dashboard** (`/admin/dashboard`) — view task stats and manage all tasks
-- **Tasks** (`/admin/tasks`) — same as dashboard (create, edit, delete tasks, assign to talents)
+- **Dashboard** (`/admin/dashboard`) — view task stats, onboarding guidance, and operational summaries
+- **Tasks** (`/admin/tasks`) — create, edit, delete, reward, and assign tasks to talents
+- **Talents** (`/admin/talents`) — review talent readiness, workload, and profile details
 - **Submissions** (`/admin/submissions`) — review talent submissions, approve or reject
 
 ### Talent
 - Log in at `/login` or register at `/register`
-- **Dashboard** (`/talent/dashboard`) — browse available (Open) tasks and claim one
-- Claimed tasks appear in **My Tasks** section with a Submit button
-- Submit a task by uploading a file and adding notes
+- **Dashboard** (`/talent/dashboard`) — review active work, profile progress, and suggested next actions
+- **Profile wizard** — complete headline, availability, skills, interests, and work style during onboarding
+- **Tasks** (`/talent/tasks`) — browse the available task marketplace and manage assigned work
+- Claim open tasks, then submit assigned tasks by uploading a file and adding notes
+- Track submitted, approved, and rejected work with task status and reward context
+
+Both roles can use the theme toggle to switch between light and dark mode. API feedback is shown with toast notifications instead of native browser alerts.
 
 ---
 
@@ -174,6 +180,7 @@ The app will open at `http://localhost:5173`
 |---|---|---|
 | POST | `/api/auth/register` | Register a new user |
 | POST | `/api/auth/login` | Login and receive a JWT token |
+| PUT | `/api/auth/profile` | Talent-only profile onboarding update |
 
 ### Admin — Tasks
 
@@ -202,8 +209,8 @@ The app will open at `http://localhost:5173`
 
 | Method | Route | Access | Description |
 |---|---|---|---|
-| POST | `/api/submissions/:taskId` | Auth | Submit a task with optional file |
-| GET | `/api/submissions/:taskId` | Auth | Get submission for a specific task |
+| POST | `/api/submissions/:taskId` | Talent | Submit an assigned task with optional file |
+| GET | `/api/submissions/:taskId` | Auth | Admins can read any task submission; talents can read only their own submission |
 | GET | `/api/submissions/admin/all` | Admin | Get all submissions |
 | PUT | `/api/submissions/:id/review` | Admin | Set reviewStatus to Approved or Rejected |
 
@@ -218,14 +225,25 @@ The app will open at `http://localhost:5173`
 | `npm run dev` | Start server with nodemon (auto-reloads on change) |
 | `npm start` | Start server with node (no auto-reload) |
 | `npm run seed` | Seed the database with sample data |
+| `npm run lint` | Run ESLint with zero warnings allowed |
 
 ### Client (`/client`)
 
 | Command | Description |
 |---|---|
 | `npm run dev` | Start Vite development server |
+| `npm run lint` | Run ESLint with zero warnings allowed |
 | `npm run build` | Build for production |
 | `npm run preview` | Preview the production build locally |
+
+### Focused tests
+
+Some focused regression tests use Node's built-in test runner:
+
+```bash
+node --test client/src/utils/*.test.js
+node --test server/controllers/submissionController.test.js server/utils/*.test.js
+```
 
 ---
 
@@ -241,7 +259,7 @@ The app will open at `http://localhost:5173`
 → Change `PORT` in `server/.env`. The Vite dev server port can be changed in `client/vite.config.js`.
 
 **Upload files not saving**
-→ The `server/uploads/` directory must be writable. It is tracked in git via `.gitkeep` — ensure it exists.
+→ The `server/uploads/` directory must be writable. The directory is tracked with `.gitkeep`, but uploaded files are ignored by Git.
 
 ---
 
@@ -254,7 +272,7 @@ Please read the full guidelines in **[CONTRIBUTING.md](./CONTRIBUTING.md)** befo
 - Pre-flight local checks (linting/building)
 - PR Template requirements
 - Our automated CI/CD Pipeline (which automatically closes failing PRs)
-- Final submission requirements (PR link & Voice recorded video)
+- Final submission requirements (PR link, UI screenshots for visual changes, and Voice recorded video)
 ---
 
 ##  CODEOWNERS

@@ -21,7 +21,7 @@ const IconTasks = () => (
 );
 
 const IconLogout = () => (
-  <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M13 10H3M13 10l-3-3M13 10l-3 3"/>
     <path d="M7 4H4a1 1 0 00-1 1v10a1 1 0 001 1h3"/>
   </svg>

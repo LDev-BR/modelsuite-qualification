@@ -3,6 +3,40 @@ const Task = require('../models/Task');
 
 const REVIEW_STATUSES = ['Approved', 'Rejected'];
 
+const normalizeId = (value) => {
+  const id = value && value._id ? value._id : value;
+  return id ? id.toString() : null;
+};
+
+const isSameId = (left, right) => {
+  const leftId = normalizeId(left);
+  const rightId = normalizeId(right);
+  return Boolean(leftId && rightId && leftId === rightId);
+};
+
+const authorizeTaskSubmission = async (req, res, next) => {
+  if (req.user.role !== 'Talent') {
+    return res.status(403).json({ message: 'Only talent users can submit tasks' });
+  }
+
+  try {
+    const task = await Task.findById(req.params.taskId);
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    if (!isSameId(task.assignedTo, req.user._id)) {
+      return res.status(403).json({ message: 'You can only submit tasks assigned to you' });
+    }
+
+    req.task = task;
+    next();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc  Submit a task with a file upload
 // @route POST /api/submissions/:taskId
 // @access Talent
@@ -15,6 +49,16 @@ const submitTask = async (req, res) => {
   }
 
   try {
+    const task = req.task || await Task.findById(taskId);
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    if (!isSameId(task.assignedTo, req.user._id)) {
+      return res.status(403).json({ message: 'You can only submit tasks assigned to you' });
+    }
+
     const fileUrl = req.file
       ? `http://localhost:5000/uploads/${req.file.filename}`
       : req.body.fileUrl || null;
@@ -47,7 +91,15 @@ const submitTask = async (req, res) => {
 // @access Auth
 const getSubmission = async (req, res) => {
   try {
-    const submission = await Submission.findOne({ taskId: req.params.taskId })
+    const query = { taskId: req.params.taskId };
+
+    if (req.user.role === 'Talent') {
+      query.talentId = req.user._id;
+    } else if (req.user.role !== 'Admin') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const submission = await Submission.findOne(query)
       .populate('talentId', 'name email');
 
     if (!submission) {
@@ -114,4 +166,10 @@ const reviewSubmission = async (req, res) => {
   }
 };
 
-module.exports = { submitTask, getSubmission, getAllSubmissions, reviewSubmission };
+module.exports = {
+  authorizeTaskSubmission,
+  submitTask,
+  getSubmission,
+  getAllSubmissions,
+  reviewSubmission,
+};
